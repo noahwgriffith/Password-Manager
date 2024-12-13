@@ -1,18 +1,26 @@
 import socket
-import threading
 import json
 
-# This should be read from a configuration file
 host = "127.0.0.1"
-port = 42069
+port = 56789
 list_file = "list.json"
 
+'''
+Function: write_list
+Purpose: Writes the password list into persistent memory as a json file
+Parameters: passwords
+'''
 def write_list(passwords):
     print("Saving list...")
     with open(list_file, "w") as outfile:
-        json.dump(passwords, outfile)
+        json.dump(passwords, outfile, separators=(",\n", ": "))
     print("List saved")
 
+'''
+Function: read_list
+Purpose: Reads the passwords in persistent memory and updates the list
+Parameters: None
+'''
 def read_list():
     print("Reading list...")
     with open(list_file, "r") as outfile:
@@ -23,20 +31,45 @@ def read_list():
 # Load passwords from file
 passwords = read_list()
 
-def new_password(user, password):
+'''
+Function: new_password
+Purpose: Adds a new entry to the password list and writes it into memory
+Parameters: user, password, passwords
+'''
+def new_password(user, password, passwords):
     print(f"Writing entry for {user}:{password} to disk...")
+    passwords[user] = password
     write_list(passwords)
 
+'''
+Function: retrieve_password
+Purpose: After reading an updated list, retrieve a password under the given username
+Parameters: user
+'''
 def retrieve_password(user):
-    print(f"Retriving entry for {user}...")
-    write_list(passwords)
+    print(f"Retrieving entry for {user}...")
+    passwords = read_list()
     return passwords[user]
 
+'''
+Function: retrieve_all
+Purpose: Retrieve the full password list
+Parameters: None
+'''
 def retrieve_all():
-    print("Fetching list!")
+    print(f"Retrieving whole list")
+    passwords = read_list()
+    print(passwords)
+    return json.dumps(passwords)
 
+'''
+Function: delete_password
+Purpose: Delete the password under a given username
+Parameters: user
+'''
 def delete_password(user):
     print(f"Deleting entry for {user}...")
+    passwords = read_list()
     if passwords.pop(user, None) == None:
         print(f"No entry for {user}. Returning None.")
         return None
@@ -44,8 +77,14 @@ def delete_password(user):
         write_list(passwords)
         return "SUCCESS"
 
+'''
+Function: edit_password
+Purpose: Change the password under a given user with a new given password
+Parameters: user, password
+'''
 def edit_password(user, password):
     print(f"Updating entry for {user} with new password {password}...")
+    passwords = read_list()
     if user in passwords:
         print(f"Found entry for {user}...")
         passwords[user] = password
@@ -55,18 +94,22 @@ def edit_password(user, password):
     else:
         return None
 
-
+'''
+Function: handle_request
+Purpose: Largest, primary function on the server.
+This function continuously loops and handles requests sent from the client.
+Parameters: user
+'''
 def handle_request(request, client):
 
     if request == "new":
+        passwords = read_list()
         print("Making a new password!")
         password = client.recv(1024).decode()
         print(f"Client sent {password}")
         user = client.recv(1024).decode()
         print(f"Client sent {user}")
-        passwords[user] = password
-        new_password(user, password)
-        write_list(passwords)
+        new_password(user, password, passwords)
 
     elif request == "retrieve":
         print("Retrieving a password!")
@@ -79,7 +122,8 @@ def handle_request(request, client):
             client.send("ERROR".encode())
 
     elif request == "retrieve_all":
-        retrieve_all()
+        passwords = read_list()
+        client.send(json.dumps(passwords).encode())
 
     elif request == "delete":
         print("Deleting a password!")
@@ -106,6 +150,7 @@ def handle_request(request, client):
         else:
             print(f"Edited password for {user}. Alerting client.")
             client.send(status.encode())
+        #write_list(passwords)
 
 def main():
     
@@ -130,11 +175,13 @@ def main():
             client.close()
 
         # Await request
+        print("Starting main loop")
+        print("===================")
         while True:
             request = client.recv(1024).decode()
             if request == "exit":
                 print("Client exited.")
-                quit() # Temporary exit until we implement threading
+                break
             handle_request(request, client)
         
 
