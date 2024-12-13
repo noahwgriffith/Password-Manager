@@ -1,3 +1,14 @@
+'''
+Noah Griffith
+CYBR-260-45
+Professor Todd Strunce
+12/13/2024
+
+Client file for password manager
+
+After the server is started this can be run in its own terminal.
+'''
+
 import socket
 from cryptography.fernet import Fernet
 import json

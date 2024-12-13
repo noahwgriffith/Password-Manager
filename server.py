@@ -1,3 +1,15 @@
+'''
+Noah Griffith
+CYBR-260-45
+Professor Todd Strunce
+12/13/2024
+
+Server file for password manager.
+
+For the sake of grading nothing needs to be changed, this should be run in its own terminal and run before the client.
+Hypothetically this script would remain running indefinitely on something like a raspberry pi with the correct host and port.
+'''
+
 import socket
 import json
 
