@@ -39,12 +39,12 @@ Generates the key for encryption. If using multiple clients the same key should 
 
 1. Getting started with this project is simple. The directory structure should look as follows:
 
-password_manager/
-├─ client.py
-├─ generate_key.py
-├─ key
-├─ list.json
-├─ server.py
+password_manager/\
+├─ client.py\
+├─ generate_key.py\
+├─ key\
+├─ list.json\
+├─ server.py\
 ├─ README.md
 
 2. Assuming this is your first time using this program you will need to generate a new key.
@@ -65,8 +65,8 @@ Wrote key to file
 
 4. Copy the necessary files to your server. The directory should look as follows:
 
-server/
-├─ list.json
+server/\
+├─ list.json\
 ├─ server.py
 
 5. Launch
@@ -77,9 +77,9 @@ python .\server.py
 
 6. Copy the necessary files to your client. The directory should look as follows:
 
-client/
-├─ client.py
-├─ generate_key.py
+client/\
+├─ client.py\
+├─ generate_key.py\
 ├─ key
 
 7. Launch
