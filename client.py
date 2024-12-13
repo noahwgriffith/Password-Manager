@@ -113,9 +113,12 @@ while True:
         passwords = json.loads(client.recv(10240).decode())
         table = PrettyTable()
         table.field_names = ["Username", "Password"]
-        for password in passwords:
-            table.add_row([password, cipher.decrypt(passwords[password].encode()).decode()])
-        print(table)
-        print("=======================================")
+        try:
+            for password in passwords:
+                table.add_row([password, cipher.decrypt(passwords[password].encode()).decode()])
+            print(table)
+            print("=======================================")
+        except:
+            print("Something went wrong. Your key is likely incorrect. Delete any entries made with the old key.")
 
 client.close()
